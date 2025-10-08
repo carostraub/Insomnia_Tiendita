@@ -85,6 +85,33 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);  
             }   
     };
+    // Función para manejar el registro
+    const register = async (name, email, password) => {
+        try {
+            const response = await fetch(`{baseURL}/api/register`, {
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name, email, password }),
+                credentials: "include"
+            });
+            const data = await response.json();
+
+            if (response.ok){
+                localStorage.setItem("access_token", data.access_token);
+                setUser(data.user || data); // Flexible con la estructura de respuesta
+                navigate("/login"); // Redirigir a la página de login
+            } else {
+                alert("Error al registrarse: " + (data.message || "No se pudo registrar"));
+            }
+        } catch (error) {
+            console.error("Error en registro:", error);
+            alert("Error al registrarse. Inténtalo de nuevo.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
 
