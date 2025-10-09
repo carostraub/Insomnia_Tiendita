@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../config/index"; // Asegúrate de tener este archivo
 
+//Falta hacer el logout y  actualizar el perfil
+
 // Crear el contexto de autenticación
 const AuthContext = createContext();
 
@@ -78,19 +80,19 @@ export const AuthProvider = ({ children }) => {
             } else {
                 alert("Error al iniciar sesión: " + (data.message || "Credenciales inválidas"));
             }
-            } catch (error) {
+        } catch (error) {
             console.error("Error en login:", error);
             alert("Error al iniciar sesión. Inténtalo de nuevo.");
-            } finally {
-            setLoading(false);  
-            }   
+        } finally {
+            setLoading(false);
+        }
     };
     // Función para manejar el registro
     const register = async (name, email, password) => {
         try {
             const response = await fetch(`{baseURL}/api/register`, {
                 method: "POST",
-                headers:{
+                headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ name, email, password }),
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }) => {
             });
             const data = await response.json();
 
-            if (response.ok){
+            if (response.ok) {
                 localStorage.setItem("access_token", data.access_token);
                 setUser(data.user || data); // Flexible con la estructura de respuesta
                 navigate("/login"); // Redirigir a la página de login
@@ -113,6 +115,14 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    return (
+        <AuthContext.Provider
+            value={{ user, loading, login, register }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 
 
-        }
+};
+export default AuthProvider;
