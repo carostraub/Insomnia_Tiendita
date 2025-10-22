@@ -109,3 +109,34 @@ class Address(db.Model):
     street = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(50), nullable=False)
     comuna = db.Column(db.String(50))
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)  
+    date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')  
+    shipping_address = db.Column(db.String, nullable=False)  
+    coupon_id = db.Column(db.Integer, db.ForeignKey('coupons.id'), nullable=True) 
+    discount_applied = db.Column(db.Float, default=0)  
+    payment_method= db.Column(db.String, default='transferencia')
+    # Relaciones
+    details = db.relationship('OrderDetail', backref='order', lazy=True) 
+
+    def serialize(self):
+        return{
+            "id":self.id,
+            "client_id": self.client_id,
+            "date": self.date.isoformat() if self.date else None,
+            "total": "{:,}".format(int(self.total)).replace(",", "."),
+            "status": self.status,
+            "shipping_address": self.shipping_address,
+            "coupon_id": self.coupon_id,
+            "discount_applied": self.discount_applied,
+            "payment_method":self.payment_method,
+            "details": [detail.serialize() for detail in self.details]  # Es hacerle serialize a la relación
+        }
+
+    def calculate_total(self):
+        pass
