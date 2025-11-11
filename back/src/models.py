@@ -15,8 +15,8 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String)  
-    price = db.Column(db.Float, nullable=False)
-    discount = db.Column(db.Float, default=0.0)
+    price = db.Column(db.Integer, nullable=False)
+    discount = db.Column(db.Integer, default=0)
     discount_expiration = db.Column(db.DateTime)
     stock = db.Column(db.Integer, default=0)
     img = db.Column(db.String(200))
@@ -47,7 +47,7 @@ class Product(db.Model):
             "description": self.description,
             "original_price": formatted_price(self.price),
             "current_price": formatted_price(self.current_price),
-            "discount_percent":round(self.discount, 2) if self.active_discount else None,
+            "discount_percent":round(self.discount) if self.active_discount else None,
             "discount_ends": self.discount_expiration.isoformat() if self.discount_expiration else None,
             "on_sale": self.active_discount,  
             "stock": self.stock,
@@ -115,11 +115,11 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)  
     date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    total = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), default='pending')  
     shipping_address = db.Column(db.String, nullable=False)  
     coupon_id = db.Column(db.Integer, db.ForeignKey('coupons.id'), nullable=True) 
-    discount_applied = db.Column(db.Float, default=0)  
+    discount_applied = db.Column(db.Integer, default=0)  
     payment_method= db.Column(db.String, default='transferencia')
     # Relaciones
     details = db.relationship('OrderDetail', backref='order', lazy=True) 
@@ -139,4 +139,4 @@ class Order(db.Model):
         }
 
     def calculate_total(self):
-        pass
+        total = sum ([d.unit_price * d.quantity for d in self.details])

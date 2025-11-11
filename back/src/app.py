@@ -5,7 +5,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models import db
-from routes import api
+#from routes import api
+from config import TestingConfig, DevelopmentConfig
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -30,11 +31,21 @@ Migrate(app, db)
 jwt = JWTManager(app)
 CORS(app) 
 
+def create_app(config_name='default'):
+    app = Flask(__name__)
+    
+    if config_name == 'testing':
+        app.config.from_object(TestingConfig)
+    else:
+        app.config.from_object(DevelopmentConfig)
+    
+    db.init_app(app)
+    return app
 @app.route('/')
 def main():
     return jsonify({"message": "REST API FLASK"}), 200
 
-app.register_blueprint(api, url_prefix="/api")
+#app.register_blueprint(api, url_prefix="/api")
 
 
 if __name__ == '__main__':
