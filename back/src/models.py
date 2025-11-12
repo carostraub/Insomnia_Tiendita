@@ -2,10 +2,10 @@ from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-db = SQLAlchemy
+db = SQLAlchemy()
 
 #Tabla de asociación para categorias
-product_category =db.Table('product_category',
+product_category = db.Table('product_category',
         db.Column('product_id', db.Integer, db.ForeignKey('products.id')),
         db.Column('category_id', db.Integer, db.ForeignKey('categories.id'))
         )
