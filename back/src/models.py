@@ -139,4 +139,38 @@ class Order(db.Model):
         }
 
     def calculate_total(self):
-        total = sum ([d.unit_price * d.quantity for d in self.details])
+        total = sum ([d.unit_price * d.quantity for d in self.details]) 
+        #REVISAR DESPUÉS SI FUNCIONA BIEN ESTO
+
+class Coupon(db.Model):  
+    __tablename__ = 'coupons'  
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(20), unique=True, nullable=False)  
+    discount = db.Column(db.Integer, nullable=False)
+    discount_type = db.Column(db.String(10), default='percentage')  
+    valid_from = db.Column(db.DateTime, nullable=False)  
+    valid_to = db.Column(db.DateTime, nullable=False)  
+    max_uses = db.Column(db.Integer, default=1)
+    current_uses = db.Column(db.Integer, default=0)  
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)
+    # Relaciones
+    orders = db.relationship('Order', backref='coupon', lazy=True)  
+class OrderDetail(db.Model):  
+    __tablename__ = 'order_details'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)  
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False) 
+    quantity = db.Column(db.Integer, nullable=False) 
+    unit_price = db.Column(db.Float, nullable=False)  
+
+class Review(db.Model):
+    __tablename__ = 'reviews'
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)  
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)  
+    rating = db.Column(db.Integer, nullable=False) 
+    comment = db.Column(db.Text)  
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc)) 
+    __table_args__ = (
+        db.UniqueConstraint('client_id', 'product_id', name='unique_review_per_product'),  
+    )
