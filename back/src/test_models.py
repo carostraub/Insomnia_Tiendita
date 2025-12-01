@@ -3,6 +3,9 @@ from datetime import datetime, timezone, timedelta
 from models import db, Product
 from app import create_app  # Necesitarás crear la app para el contexto
 
+
+    
+
 class TestProductModels(unittest.TestCase):
     
     def setUp(self):

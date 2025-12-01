@@ -139,8 +139,18 @@ class Order(db.Model):
         }
 
     def calculate_total(self):
-        total = sum ([d.unit_price * d.quantity for d in self.details]) 
-        #REVISAR DESPUÉS SI FUNCIONA BIEN ESTO
+        total = 0
+        for detail in self.details: #details relacion de order
+            subtotal = detail.unit_price * detail.quantity
+            total += subtotal
+        #aplicar cupón si es que existe
+        if self.coupon_id and self.coupon_id.is_valid():
+            if self.coupon.discount_type == 'percentage':
+                total *= (1 - self.coupon.discount / 100)
+            elif self.coupon.discount_type == 'fixed':
+                total -= self.coupon.discount
+        self.total = int(round(total))
+        return self.total
 
 class Coupon(db.Model):  
     __tablename__ = 'coupons'  
@@ -155,13 +165,14 @@ class Coupon(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)
     # Relaciones
     orders = db.relationship('Order', backref='coupon', lazy=True)  
+    
 class OrderDetail(db.Model):  
     __tablename__ = 'order_details'
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)  
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False) 
     quantity = db.Column(db.Integer, nullable=False) 
-    unit_price = db.Column(db.Float, nullable=False)  
+    unit_price = db.Column(db.Integer, nullable=False)  
 
 class Review(db.Model):
     __tablename__ = 'reviews'

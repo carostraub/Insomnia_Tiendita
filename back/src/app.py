@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models import db
-#from routes import api
+from routes import api
 from config import TestingConfig, DevelopmentConfig
 from dotenv import load_dotenv
 from datetime import timedelta
