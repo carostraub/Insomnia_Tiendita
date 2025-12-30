@@ -34,7 +34,16 @@ class Product(db.Model):
     
     @property
     def active_discount(self): #Verificar que el descuento este activo
-        return (self.discount > 0 and (not self.discount_expiration or self.discount_expiration > datetime.now(timezone.utc)))
+        if self.discount <= 0: # Si no hay descuento
+            return False
+        now = datetime.now(timezone.utc) #Fecha actual con zona horaria
+
+        if not self.discount_expiration: #Si no hay fecha de expiración
+            return True
+        expiration = self.discount_expiration
+        if expiration.tzinfo is None: #Si no tiene timezone
+            expiration = expiration.replace(tzinfo=timezone.utc)
+        return expiration > now
     
     def serialize(self):
         def formatted_price(value):
