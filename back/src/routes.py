@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import cloudinary.uploader
 from flask_cors import cross_origin, CORS
 from flask import Blueprint, request, jsonify
@@ -9,3 +10,42 @@ from models  import db, product_category, Product, Category,Client, Address, Ord
 #falta hacer decorador y config imagenes
 
 api = Blueprint("api", __name__)
+load_dotenv()
+
+@api.route('/register', methods=['POST'])
+def register():
+    email = request.form.get("email")
+    password = request.form.get("password")
+    name = request.form.get("name")
+    subscribe = request.form.get("subscribe", "false").lower() == "true"
+
+    if not all([email, password, name]):
+        return jsonify({"error":"Hay que completar todos los campos obligatorios"}), 400
+    if Client.query.filter_by(email=email).first():
+        return jsonify({"error":"Este mail ya esta registrado"}), 409
+    
+    is_admin = False
+    if email == os.getenv(ADMIN_EMAIL) and password == os.getenv(ADMIN_PASSWORD):
+        is_admin = True
+    else:
+        return jsonify({"error":"Credenciales incorrectas para Admin"})
+    
+    client = Client(
+        email = email,
+        name = name,
+        subscribe = subscribe,
+        admin = is_admin
+    )
+    client.set_password(password)
+
+    try: 
+        db.session.add(client)
+        db.session.commit()
+        access_token = create_access_token(identity=client.id)
+
+        return jsonify({
+            "message": "Bienvenido al club de Insomnia Tiendita",
+            "client": client.serialize(),
+            "access_token": access_token
+        }), 201
+    
