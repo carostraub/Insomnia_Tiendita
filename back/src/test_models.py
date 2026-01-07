@@ -219,7 +219,7 @@ class TestOrderModels(unittest.TestCase):
 
         detail3 = OrderDetail(
             order_id = order.id,
-            product_id = product3,
+            product_id = product3.id,
             quantity = 1,
             unit_price = product3.current_price
         )
