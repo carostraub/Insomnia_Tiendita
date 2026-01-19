@@ -1,15 +1,13 @@
 import unittest
 from datetime import datetime, timezone, timedelta
 from models import db, Product, Order, OrderDetail, Client
-from app import create_app  # Necesitarás crear la app para el contexto
-
-
+from app import create_app  # ¡Ahora SÍ existe esta función!
 
 class TestProductModels(unittest.TestCase):
     
     def setUp(self):
         """Configuración antes de cada test"""
-        self.app = create_app('testing')  # Configuración para testing
+        self.app = create_app('testing')  # ✅ Esto ahora FUNCIONA
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
@@ -20,6 +18,8 @@ class TestProductModels(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
     
+    # ... TUS TESTS EXACTAMENTE COMO LOS TENÍAS ...
+    # NO CAMBIES NADA aquí abajo
     def test_current_price_no_discount(self):
         """Test: Precio sin descuento"""
         # Crear producto sin descuento
@@ -117,7 +117,7 @@ class TestProductModels(unittest.TestCase):
 class TestOrderModels(unittest.TestCase):
     def setUp(self):
         """Configuración antes de cada test"""
-        self.app = create_app('testing')  # Configuración para testing
+        self.app = create_app('testing')  # ✅ Esto ahora FUNCIONA
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
@@ -230,175 +230,5 @@ class TestOrderModels(unittest.TestCase):
         expected_total = 50250 
         self.assertEqual(total, expected_total)
 
-        
-
-
-        
-
 if __name__ == '__main__':
     unittest.main()
-
-""" import unittest
-from datetime import datetime, timezone, timedelta
-from models import db, Product, Order, OrderDetail, Client
-from app import create_app
-
-class TestOrderModels(unittest.TestCase):
-    def setUp(self):
-        #Configuración antes de cada test
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-    
-    def tearDown(self):
-        #Limpieza después de cada test
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-    
-    def test_calculate_total_no_discount(self):
-        #Test: Calcular total con 3 productos sin descuento
-        # 1. Crear cliente
-        cliente = Client(
-            name="Cliente Test",
-            email="test@test.com"
-        )
-        cliente.set_password("password123")
-        db.session.add(cliente)
-        
-        # 2. Crear productos sin descuento
-        producto1 = Product(
-            name="Producto 1",
-            price=10000,
-            discount=0,
-            discount_expiration=None,
-            stock=10
-        )
-        
-        producto2 = Product(
-            name="Producto 2",
-            price=15000,
-            discount=0,
-            discount_expiration=None,
-            stock=5
-        )
-        
-        producto3 = Product(
-            name="Producto 3",
-            price=5000,
-            discount=0,
-            discount_expiration=None,
-            stock=20
-        )
-        
-        db.session.add_all([producto1, producto2, producto3])
-        db.session.commit()
-        
-        # 3. Crear orden
-        orden = Order(
-            client_id=cliente.id,
-            shipping_address="Calle Test 123",
-            total=0  # Temporal, se calculará
-        )
-        db.session.add(orden)
-        db.session.commit()
-        
-        # 4. Agregar productos a la orden
-        detalle1 = OrderDetail(
-            order_id=orden.id,
-            product_id=producto1.id,
-            quantity=2,  # 2 unidades
-            unit_price=producto1.current_price  # 10000
-        )
-        
-        detalle2 = OrderDetail(
-            order_id=orden.id,
-            product_id=producto2.id,
-            quantity=1,  # 1 unidad
-            unit_price=producto2.current_price  # 15000
-        )
-        
-        detalle3 = OrderDetail(
-            order_id=orden.id,
-            product_id=producto3.id,
-            quantity=3,  # 3 unidades
-            unit_price=producto3.current_price  # 5000
-        )
-        
-        db.session.add_all([detalle1, detalle2, detalle3])
-        db.session.commit()
-        
-        # 5. Calcular total
-        total_calculado = orden.calculate_total()  # ← CON paréntesis
-        
-        # 6. Verificar cálculo manual
-        # Producto1: 2 × 10000 = 20000
-        # Producto2: 1 × 15000 = 15000  
-        # Producto3: 3 × 5000 = 15000
-        # TOTAL: 20000 + 15000 + 15000 = 50000
-        total_esperado = 50000
-        
-        self.assertEqual(total_calculado, total_esperado)
-        print(f"✅ Total calculado: ${total_calculado:,}")
-    
-    def test_calculate_total_with_product_discount(self):
-       #Test: Calcular total con productos con descuento
-        # Crear productos con descuento
-        futuro = datetime.now(timezone.utc) + timedelta(days=1)
-        
-        producto_descuento = Product(
-            name="Producto con 50% descuento",
-            price=20000,
-            discount=50,  # 50% de descuento
-            discount_expiration=futuro,
-            stock=10
-        )
-        
-        producto_normal = Product(
-            name="Producto normal",
-            price=10000,
-            discount=0,
-            discount_expiration=None,
-            stock=10
-        )
-        
-        db.session.add_all([producto_descuento, producto_normal])
-        
-        # Crear orden y detalles
-        orden = Order(
-            shipping_address="Calle Test 456",
-            total=0
-        )
-        db.session.add(orden)
-        db.session.commit()
-        
-        # Agregar productos
-        # Producto con descuento: 20000 - 50% = 10000
-        detalle1 = OrderDetail(
-            order_id=orden.id,
-            product_id=producto_descuento.id,
-            quantity=2,  # 2 unidades
-            unit_price=producto_descuento.current_price  # 10000 (con descuento)
-        )
-        
-        # Producto normal: 10000
-        detalle2 = OrderDetail(
-            order_id=orden.id,
-            product_id=producto_normal.id,
-            quantity=1,  # 1 unidad
-            unit_price=producto_normal.current_price  # 10000
-        )
-        
-        db.session.add_all([detalle1, detalle2])
-        db.session.commit()
-        
-        # Calcular total
-        total = orden.calculate_total()
-        
-        # Verificar: (2 × 10000) + (1 × 10000) = 30000
-        self.assertEqual(total, 30000)
-        print(f"✅ Total con descuentos: ${total:,}")
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2) """

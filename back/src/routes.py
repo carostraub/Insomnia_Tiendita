@@ -25,7 +25,7 @@ def register():
         return jsonify({"error":"Este mail ya esta registrado"}), 409
     
     is_admin = False
-    if email == os.getenv(ADMIN_EMAIL) and password == os.getenv(ADMIN_PASSWORD):
+    if email == os.getenv("ADMIN_EMAIL") and password == os.getenv("ADMIN_PASSWORD"):
         is_admin = True
     else:
         return jsonify({"error":"Credenciales incorrectas para Admin"})
@@ -48,4 +48,7 @@ def register():
             "client": client.serialize(),
             "access_token": access_token
         }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error":"Error en el servidor"}), 500
     
