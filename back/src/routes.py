@@ -85,12 +85,37 @@ def set_up():
         db.session.commit()
         access_token = create_access_token (identity=client.id)
         return jsonify ({
-            "message": "El administrador ha sido cnofigurado exitosamente",
+            "message": "El administrador ha sido configurado exitosamente",
             "client": client.serialize(),
             "access_token": access_token
         }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error":"Error en el servidor"}), 500
+
+@api.route('/login', methods= ['POST'])
+def login():
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if not email:
+        return jsonify({ "error": "El email es requerido"}), 400
+    if not password:
+        return jsonify({"error": "La constraseña es requerida"}), 400
+    
+    client = Client.query.filter_by(email=email).first()
+    if not client:
+        return jsonify({"error": "Datos incorrectos"}), 401
+    if not client.check_password(password):
+        return jsonify({"error":"Datos incorrectos"}), 401
+    
+
+    email = email.strip().lower()
+    access_token = create_access_token(identity=client.id)
+
+    return jsonify({
+        "access_token": access_token,
+        "client": client.serialize()
+    }), 200
 
 
