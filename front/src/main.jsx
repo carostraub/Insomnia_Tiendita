@@ -6,12 +6,16 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import './index.css'
 import { Layout } from "./Layout"
+import AuthProvider from "./Context/AuthContext"
 
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+    <AuthProvider>
 
-    <Layout />
+      <Layout />
+    </AuthProvider>
+
   </BrowserRouter>
 
 )
