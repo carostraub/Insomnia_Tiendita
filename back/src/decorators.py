@@ -1,0 +1,16 @@
+from functools import wraps
+from flask import jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from models import Client, db
+
+def admin_required(f):
+    @wraps(f)
+    @jwt_required()
+    def wrapper(*args, **kwargs):
+        current_user_id = get_jwt_identity()
+        user = db.session.get(Client, current_user_id)
+
+        if not user or not user.admin:
+            return jsonify({"error":"Acceso denegado"}), 403
+        return f(*args, **kwargs)
+    return wrapper

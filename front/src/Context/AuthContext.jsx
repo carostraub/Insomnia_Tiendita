@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 // Verificar token con el endpoint correcto
-                const response = await fetch(`${baseURL}/api/profile`, {
+                /* const response = await fetch(`${baseURL}/api/orders`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
                     console.log("Token inválido, limpiando...");
                     localStorage.removeItem("access_token");
                     setUser(null);
-                }
+                } */
             } catch (error) {
                 console.error("Error verificando autenticación:", error);
                 setUser(null);
@@ -63,22 +63,24 @@ export const AuthProvider = ({ children }) => {
     // Función para manejar el login
     const login = async (email, password) => {
         try {
+            const formData = new FormData();
+            formData.append("email", email);
+            formData.append("password",password);
+
             const response = await fetch(`${baseURL}/api/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password }),
+                
+                body: formData,
                 credentials: "include"
             });
             const data = await response.json();
 
             if (response.ok) {
                 localStorage.setItem("access_token", data.access_token);
-                setUser(data.user || data); // Flexible con la estructura de respuesta
+                setUser(data.client || data.user || data); // Flexible con la estructura de respuesta
                 navigate("/"); // Redirigir a la página principal u otra ruta
             } else {
-                alert("Error al iniciar sesión: " + (data.message || "Credenciales inválidas"));
+                alert("Error al iniciar sesión: " + (data.error || "Credenciales inválidas"));
             }
         } catch (error) {
             console.error("Error en login:", error);
@@ -90,22 +92,24 @@ export const AuthProvider = ({ children }) => {
     // Función para manejar el registro
     const register = async (name, email, password) => {
         try {
-            const response = await fetch(`{baseURL}/api/register`, {
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("password", password);
+            const response = await fetch(`${baseURL}/api/register`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name, email, password }),
+              
+                body: formData,
                 credentials: "include"
             });
             const data = await response.json();
 
             if (response.ok) {
                 localStorage.setItem("access_token", data.access_token);
-                setUser(data.user || data); // Flexible con la estructura de respuesta
+                setUser(data.client || data.user || data); // Flexible con la estructura de respuesta
                 navigate("/login"); // Redirigir a la página de login
             } else {
-                alert("Error al registrarse: " + (data.message || "No se pudo registrar"));
+                alert("Error al registrarse: " + (data.error || "No se pudo registrar"));
             }
         } catch (error) {
             console.error("Error en registro:", error);
