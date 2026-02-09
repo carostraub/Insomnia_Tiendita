@@ -17,8 +17,8 @@ const Login = () => {
 
 
   return (
-    <form className="container w-50 mt-1" onSubmit={handleSubmit}>
-      <div className="mb-3">
+    <form className="container w-50 mt-4" onSubmit={handleSubmit}>
+      <div className="mb-3 pt-5">
         <label htmlFor="exampleInputEmail1" className="form-label">
           Dirección de email
         </label>
@@ -45,16 +45,6 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-      </div>
-      <div className="mb-3 form-check">
-        <input
-          type="checkbox"
-          className="form-check-input"
-          id="exampleCheck1"
-        />
-        <label className="form-check-label" htmlFor="exampleCheck1">
-          Confirmar datos
-        </label>
       </div>
       <button type="submit" className="btn btn-light">
         Iniciar sesión
