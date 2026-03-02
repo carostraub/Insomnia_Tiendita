@@ -6,6 +6,8 @@ from flask_cors import cross_origin, CORS
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from models import db, product_category, Product, Category, Client, Address, Order, OrderDetail, Review, Coupon
+from decorators import admin_required
+from config_img import allowed_files
 
 api = Blueprint("api", __name__)
 load_dotenv()
@@ -125,3 +127,48 @@ def login():
         "access_token": access_token,
         "client": client.serialize()
     }), 200
+
+@api.route('/products', methods=["POST"])
+@admin_required()
+def new_porduct():
+    if 'name' not in request.form or not request.form['name']:
+        return jsonify({"error":"El nombre es obligatorio"}), 400
+    if  'description' not in request.form or not request.form['description'] :
+        return jsonify({"error":"La descripción es obligatoria"}), 400
+    if 'price' not in request.form or not request.form['price']:
+        return jsonify({"error":"El precio es obligatorio"}), 400
+    
+    image_url=None
+    if 'photo' in request.files:
+        image=request.files['photo']
+     
+    if image.filename == "":
+        return jsonify({"error":"Nombre del archivo vacío"}), 400
+    if not allowed_files(image.filename):
+        return jsonify({"error":"Formato de archivo no permitido"}), 400
+    
+    try: #para subir la imagen a cloudinary
+        upload_result = cloudinary.uploader.upload(image, folder="products")
+        image_url=upload_result['secure_url']
+
+    except Exception as e:
+            return jsonify({"error": f"Error al subir imagen: {str(e)}"}), 500
+    try:
+        new_product = Product(
+            name=request.form['name'],
+            description=request.form['description'],
+            price=float(request.form['price']),
+            img=image_url
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        return jsonify({
+            "msg":"Producto creado",
+            "product":new_product.serialize()
+            }), 201
+    except ValueError:
+        db.session.rollback()
+        return jsonify({"error":"Precio o stock inválido"}), 400
+    except Exception as e:  # Otros errores de BD
+        db.session.rollback()
+        return jsonify({"error": f"Error en la base de datos: {str(e)}"}), 500

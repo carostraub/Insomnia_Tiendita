@@ -39,7 +39,7 @@ const Register = () => {
         console.log("Usuario registrado", result);
         navigate("/login");
       } else {
-        alert("Error en el registro: " + result.error);
+        alert("Error en el registro: " + (result.error || "Error desconocido"));
       }
     } catch (error) {
       console.error("Error en la petición", error);
@@ -62,7 +62,7 @@ const Register = () => {
 
             <h6>Nombre completo</h6>
             <input 
-            className="mb-3" 
+            className="form-control mb-3" 
             type="text" 
             name="name" 
             placeholder="Nombre" 
@@ -72,7 +72,7 @@ const Register = () => {
 
             <h6>Email</h6>
             <input 
-            className='mb-3' 
+            className='form-control mb-3' 
             type="email" 
             name="email" 
             placeholder='email' 
@@ -82,7 +82,7 @@ const Register = () => {
 
             <h6>Contraseña</h6>
             <input 
-            className="mb-3" 
+            className="form-control mb-3" 
             type="password" 
             name="password" 
             placeholder="Contraseña" 
@@ -92,17 +92,17 @@ const Register = () => {
             
             <div className="form-check">
               <input 
-              className="form-check-input" 
+              className="form-check-input mt-3" 
               type="checkbox" 
               name='subscribe'
               checked={formData.subscribe} 
               id="checkDefault" 
               onChange={handleChange} />
-                <label className="form-check-label" for="checkDefault">
+                <label className="form-check-label mt-2" for="checkDefault">
                   Subscribirse para recibir promociones y notificaciones de eventos realizados por Insomnia
                 </label>
             </div>
-            <button type='submit' className='btn btn-light'>
+            <button type='submit' className='btn btn-light mt-4'>
               Registrarse
             </button>
 
