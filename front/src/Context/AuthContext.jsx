@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../config/index"; // Asegúrate de tener este archivo
 
-//Falta hacer el logout y  actualizar el perfil
+//Falta  actualizar el perfil
 
 // Crear el contexto de autenticación
 const AuthContext = createContext();
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 // Verificar token con el endpoint correcto
-                /* const response = await fetch(`${baseURL}/api/orders`, {
+                 const response = await fetch(`${baseURL}/api/profile`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -42,13 +42,13 @@ export const AuthProvider = ({ children }) => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setUser(data.user || data); // Flexible con la estructura de respuesta
+                    setUser(data.client || data.user || data); // Flexible con la estructura de respuesta
                 } else {
                     // Token inválido o expirado - limpiar localStorage
                     console.log("Token inválido, limpiando...");
                     localStorage.removeItem("access_token");
                     setUser(null);
-                } */
+                } 
             } catch (error) {
                 console.error("Error verificando autenticación:", error);
                 setUser(null);

@@ -128,6 +128,16 @@ def login():
         "client": client.serialize()
     }), 200
 
+@api.route('/profile', methods=["GET"])
+@jwt_required
+def profile():
+    user_id = get_jwt_identity()
+    user = db.session.get(Client, user_id)
+
+    if not user:
+        return jsonify({"error":"Usuario no encontrado"}), 400
+    return jsonify(user.serialize()), 200
+
 @api.route('/products', methods=["POST"])
 @admin_required()
 def new_porduct():

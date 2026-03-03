@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import AboutUs from "../views/AboutUs";
+import { useAuth } from "../Context/AuthContext";
 
 const Navbar = () => {
+  const { user } = useAuth();
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
@@ -20,7 +22,7 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item"> 
-              <a className="nav-link active" href="https://www.instagram.com/insomniatiendita/" target="_blank" rel="noopener noreferrer">
+              <a className="nav-link active" to="https://www.instagram.com/insomniatiendita/" target="_blank" rel="noopener noreferrer">
               <i className="fa-brands fa-lg fa-instagram"></i>
               </a>
             </li>
@@ -29,20 +31,25 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a className="nav-link dropdown-toggle" to="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Productos
               </a>
               <ul className="dropdown-menu dropdown-menu-start">
-                <li><Link className="dropdown-item" href="#">Totebags</Link></li>
-                <li><Link className="dropdown-item" href="#">Ilustraciones</Link></li>
-                <li><Link className="dropdown-item" href="#">Fotocards fanmade</Link></li>
+                <li><Link className="dropdown-item" to="#">Totebags</Link></li>
+                <li><Link className="dropdown-item" to="#">Ilustraciones</Link></li>
+                <li><Link className="dropdown-item" to="#">Fotocards fanmade</Link></li>
                 <li><Link className="dropdown-item">Poleras</Link></li>
               </ul>
             </li>
             <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/login" >
+              {user ? (
+                <span> Hola {user.name}</span>
+              ) :(
+                <Link className="nav-link active" aria-current="page" to="/login" >
               <i className="fa-solid fa-lg fa-user"></i>
               </Link>
+
+              )}
             </li>
             <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/checkout" >
