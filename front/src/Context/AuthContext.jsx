@@ -120,21 +120,12 @@ export const AuthProvider = ({ children }) => {
     };
 
 
-    const logout = async () => {
-            try {
-                await fetch(`${baseURL}/api/logout`, {
-                    method: "POST",
-                    credentials: "include",
-                });
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem("access_token");
+        navigate("/login");
+    };
 
-                setUser(null);
-                localStorage.removeItem("access_token");
-                navigate("/login");
-            } catch (error) {
-                console.error("Error en logout:", error);
-            }
-        };
-    
 
     return (
         <AuthContext.Provider
