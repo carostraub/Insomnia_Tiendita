@@ -65,11 +65,11 @@ export const AuthProvider = ({ children }) => {
         try {
             const formData = new FormData();
             formData.append("email", email);
-            formData.append("password",password);
+            formData.append("password", password);
 
             const response = await fetch(`${baseURL}/api/login`, {
                 method: "POST",
-                
+
                 body: formData,
                 credentials: "include"
             });
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
             formData.append("password", password);
             const response = await fetch(`${baseURL}/api/register`, {
                 method: "POST",
-              
+
                 body: formData,
                 credentials: "include"
             });
@@ -116,12 +116,29 @@ export const AuthProvider = ({ children }) => {
             alert("Error al registrarse. Inténtalo de nuevo.");
         } finally {
             setLoading(false);
-        }
+        };
     };
+
+
+    const logout = async () => {
+            try {
+                await fetch(`${baseURL}/api/logout`, {
+                    method: "POST",
+                    credentials: "include",
+                });
+
+                setUser(null);
+                localStorage.removeItem("access_token");
+                navigate("/login");
+            } catch (error) {
+                console.error("Error en logout:", error);
+            }
+        };
+    
 
     return (
         <AuthContext.Provider
-            value={{ user, loading, login, register }}
+            value={{ user, loading, login, register, logout }}
         >
             {children}
         </AuthContext.Provider>

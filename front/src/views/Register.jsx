@@ -58,7 +58,7 @@ const Register = () => {
       <h2>Registro</h2>
       <form onSubmit={handleSubmit}>
         <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-12 mt-1">
 
             <h6>Nombre completo</h6>
             <input 
