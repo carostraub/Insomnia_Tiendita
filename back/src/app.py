@@ -1,4 +1,4 @@
-import cloudinary
+#import cloudinary
 import os
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -12,12 +12,12 @@ from datetime import timedelta
 load_dotenv()
 
 # Configuración de Cloudinary
-cloudinary.config(
+""" cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True
-)
+) """
 
 # ========== ¡IMPORTANTE! MANTENER ESTA FUNCIÓN PARA TESTS ==========
 def create_app(config_name='testing'):

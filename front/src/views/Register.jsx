@@ -98,7 +98,7 @@ const Register = () => {
               checked={formData.subscribe} 
               id="checkDefault" 
               onChange={handleChange} />
-                <label className="form-check-label mt-2" for="checkDefault">
+                <label className="form-check-label mt-2" htmlFor="checkDefault">
                   Subscribirse para recibir promociones y notificaciones de eventos realizados por Insomnia
                 </label>
             </div>
