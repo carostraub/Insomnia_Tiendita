@@ -139,7 +139,7 @@ def profile():
     return jsonify(user.serialize()), 200
 
 @api.route('/products', methods=["POST"])
-@admin_required()
+@admin_required
 def new_porduct():
     if 'name' not in request.form or not request.form['name']:
         return jsonify({"error":"El nombre es obligatorio"}), 400
